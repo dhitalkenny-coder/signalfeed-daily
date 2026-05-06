@@ -83,24 +83,29 @@ function ProgressPage() {
       </div>
 
       <section className="mt-8">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        <h2 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
           By category
         </h2>
-        <div className="mt-3 grid gap-2">
-          {perCategory.map((c) => (
-            <div
-              key={c.name}
-              className="flex items-center justify-between rounded-xl border border-border bg-card/60 px-4 py-3"
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-lg">{c.icon}</span>
-                <span className="text-sm font-medium">{c.name}</span>
+        <div className="mt-3 divide-y divide-border/60 rounded-xl border border-border bg-card/40">
+          {perCategory.map((c) => {
+            const Icon = c.Icon;
+            return (
+              <div
+                key={c.name}
+                className="flex items-center justify-between px-3.5 py-2.5"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className={`inline-flex h-6 w-6 items-center justify-center rounded-md bg-background/60 border border-border ${c.tone}`}>
+                    <Icon className="h-3.5 w-3.5" strokeWidth={2} />
+                  </span>
+                  <span className="text-[13px] font-medium">{c.name}</span>
+                </div>
+                <span className="text-[11px] text-muted-foreground">
+                  {c.count} quest{c.count === 1 ? "" : "s"}
+                </span>
               </div>
-              <span className="text-xs text-muted-foreground">
-                {c.count} quest{c.count === 1 ? "" : "s"}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
