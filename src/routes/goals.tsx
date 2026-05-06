@@ -6,7 +6,7 @@ import { useLocalStorage } from "@/lib/use-local-storage";
 
 export const Route = createFileRoute("/goals")({
   head: () => ({ meta: [{ title: "Choose your goals · SignalFeed" }] }),
-  component: Goals;
+  component: Goals,
 });
 
 function Goals() {
