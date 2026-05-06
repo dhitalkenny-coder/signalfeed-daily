@@ -1,16 +1,16 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, Bookmark, Sparkles, Upload } from "lucide-react";
+import { Flame, Target, Bookmark, TrendingUp } from "lucide-react";
 
 const items = [
-  { to: "/feed", label: "Feed", icon: Home },
+  { to: "/quests", label: "Quests", icon: Flame },
+  { to: "/goals", label: "Goals", icon: Target },
   { to: "/saved", label: "Saved", icon: Bookmark },
-  { to: "/interests", label: "Interests", icon: Sparkles },
-  { to: "/admin", label: "Admin", icon: Upload },
+  { to: "/progress", label: "Progress", icon: TrendingUp },
 ] as const;
 
 export function BottomNav() {
   const { pathname } = useLocation();
-  if (pathname === "/") return null;
+  if (pathname === "/" || pathname.startsWith("/admin")) return null;
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/85 backdrop-blur-xl">
       <div className="mx-auto max-w-md grid grid-cols-4">
