@@ -38,7 +38,12 @@ function Landing() {
           className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight text-balance"
         >
           Become{" "}
-          <span className="bg-signal-gradient bg-clip-text text-transparent">1% better</span>
+          <span
+            className="bg-signal-gradient bg-clip-text"
+            style={{ WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", color: "transparent" }}
+          >
+            1% better
+          </span>
           <br /> every day.
         </motion.h1>
 
