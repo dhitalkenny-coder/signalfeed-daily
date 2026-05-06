@@ -12,20 +12,42 @@ export type Category =
   | "Productivity"
   | "Confidence";
 
-export const CATEGORIES: { name: Category; icon: string; blurb: string }[] = [
-  { name: "Current Affairs", icon: "🗞️", blurb: "Stay informed without the noise" },
-  { name: "Art & Culture", icon: "🎨", blurb: "Sharpen taste and perspective" },
-  { name: "AI & Technology", icon: "🤖", blurb: "Use the tools shaping the future" },
-  { name: "Money", icon: "💸", blurb: "Build smarter habits with money" },
-  { name: "Business", icon: "📈", blurb: "Think like an operator" },
-  { name: "Health & Wellness", icon: "🌿", blurb: "Move, sleep, eat better" },
-  { name: "Beauty & Lifestyle", icon: "✨", blurb: "Small upgrades, big difference" },
-  { name: "Creativity", icon: "🎭", blurb: "Make more, judge less" },
-  { name: "Cooking", icon: "🍳", blurb: "Cook things you'd pay for" },
-  { name: "Philosophy & Spirituality", icon: "🕊️", blurb: "Think clearly, live deeper" },
-  { name: "Productivity", icon: "⚡", blurb: "Get focused, finish things" },
-  { name: "Confidence", icon: "🔥", blurb: "Show up as your boldest self" },
-];
+import {
+  Newspaper,
+  Palette,
+  Cpu,
+  Wallet,
+  Briefcase,
+  HeartPulse,
+  Sparkles as SparklesIcon,
+  PenTool,
+  Utensils,
+  BookOpen,
+  Zap,
+  Flame,
+  type LucideIcon,
+} from "lucide-react";
+
+export const CATEGORY_META: Record<
+  Category,
+  { Icon: LucideIcon; blurb: string; tone: string }
+> = {
+  "Current Affairs": { Icon: Newspaper, blurb: "Stay informed without the noise", tone: "text-slate-300" },
+  "Art & Culture": { Icon: Palette, blurb: "Sharpen taste and perspective", tone: "text-rose-300" },
+  "AI & Technology": { Icon: Cpu, blurb: "Use the tools shaping the future", tone: "text-cyan-300" },
+  "Money": { Icon: Wallet, blurb: "Build smarter habits with money", tone: "text-emerald-300" },
+  "Business": { Icon: Briefcase, blurb: "Think like an operator", tone: "text-amber-300" },
+  "Health & Wellness": { Icon: HeartPulse, blurb: "Move, sleep, eat better", tone: "text-green-300" },
+  "Beauty & Lifestyle": { Icon: SparklesIcon, blurb: "Small upgrades, big difference", tone: "text-pink-200" },
+  "Creativity": { Icon: PenTool, blurb: "Make more, judge less", tone: "text-purple-300" },
+  "Cooking": { Icon: Utensils, blurb: "Cook things you'd pay for", tone: "text-orange-300" },
+  "Philosophy & Spirituality": { Icon: BookOpen, blurb: "Think clearly, live deeper", tone: "text-indigo-300" },
+  "Productivity": { Icon: Zap, blurb: "Get focused, finish things", tone: "text-sky-300" },
+  "Confidence": { Icon: Flame, blurb: "Show up as your boldest self", tone: "text-orange-400" },
+};
+
+export const CATEGORIES: { name: Category; Icon: LucideIcon; blurb: string; tone: string }[] =
+  (Object.keys(CATEGORY_META) as Category[]).map((name) => ({ name, ...CATEGORY_META[name] }));
 
 export type Difficulty = "Beginner" | "Intermediate" | "Advanced";
 

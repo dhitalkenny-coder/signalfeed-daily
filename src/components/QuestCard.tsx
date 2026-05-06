@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { Bookmark, BookmarkCheck, Check, Clock, ExternalLink, Sparkles, Zap } from "lucide-react";
-import type { Quest } from "@/lib/quests-data";
+import { Bookmark, BookmarkCheck, Check, Clock, ExternalLink, Zap } from "lucide-react";
+import { CATEGORY_META, type Quest } from "@/lib/quests-data";
 
 interface Props {
   quest: Quest;
@@ -12,72 +12,69 @@ interface Props {
 }
 
 export function QuestCard({ quest, index, saved, completed, onComplete, onToggleSave }: Props) {
+  const meta = CATEGORY_META[quest.category];
+  const Icon = meta.Icon;
   return (
     <motion.article
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.04, ease: [0.22, 1, 0.36, 1] }}
-      className={`relative overflow-hidden rounded-2xl border p-5 shadow-elegant transition-all ${
+      transition={{ duration: 0.35, delay: index * 0.03, ease: [0.22, 1, 0.36, 1] }}
+      className={`relative overflow-hidden rounded-2xl border p-4 transition-all ${
         completed
-          ? "border-signal/40 bg-signal/5"
-          : "border-border bg-card-gradient"
+          ? "border-signal/30 bg-signal/[0.04]"
+          : "border-border bg-card-gradient shadow-elegant"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-background/60 border border-border text-xl">
-            {quest.icon}
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-background/70 border border-border ${meta.tone}`}>
+            <Icon className="h-4 w-4" strokeWidth={2} />
           </div>
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground truncate">
+            <p className="text-[10.5px] uppercase tracking-[0.16em] text-muted-foreground truncate">
               {quest.category}
             </p>
-            <p className="text-[11px] text-signal mt-0.5 inline-flex items-center gap-1">
-              <Sparkles className="h-3 w-3" /> +{quest.xpReward} XP
+            <p className="text-[10.5px] mt-0.5 inline-flex items-center gap-1 rounded-full border border-gold/30 bg-gold/10 px-1.5 py-0.5 text-gold">
+              +{quest.xpReward} XP
             </p>
           </div>
         </div>
         <button
           onClick={() => onToggleSave(quest.id)}
           aria-label={saved ? "Unsave" : "Save"}
-          className={`shrink-0 rounded-lg p-2 transition-colors ${
+          className={`shrink-0 rounded-lg p-1.5 transition-colors ${
             saved ? "text-signal" : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          {saved ? <BookmarkCheck className="h-5 w-5" /> : <Bookmark className="h-5 w-5" />}
+          {saved ? <BookmarkCheck className="h-[18px] w-[18px]" /> : <Bookmark className="h-[18px] w-[18px]" />}
         </button>
       </div>
 
-      <h2 className="mt-3 text-lg font-semibold leading-snug text-balance">
+      <h2 className="mt-3 text-[17px] font-semibold leading-snug text-balance">
         {quest.questTitle}
       </h2>
-      <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{quest.summary}</p>
+      <p className="mt-1 text-[13px] text-muted-foreground leading-relaxed line-clamp-2">{quest.summary}</p>
 
-      <div className="mt-3 rounded-xl border border-signal/30 bg-signal/5 p-3 text-sm">
-        <div className="text-[11px] font-medium uppercase tracking-widest text-signal flex items-center gap-1.5">
+      <div className="mt-3 rounded-xl border border-signal/25 bg-signal/[0.06] px-3 py-2.5">
+        <div className="text-[10.5px] font-medium uppercase tracking-widest text-signal flex items-center gap-1.5">
           <Zap className="h-3 w-3" /> Do this today
         </div>
-        <p className="mt-1 text-foreground/90">{quest.doThisToday}</p>
+        <p className="mt-1 text-[13.5px] text-foreground/90 leading-snug">{quest.doThisToday}</p>
       </div>
 
-      <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-        <span className="text-foreground/80 font-medium">Why it matters: </span>
-        {quest.whyItMatters}
-      </p>
-
-      <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
+      <div className="mt-3 flex items-center justify-between text-[11px] text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
-          <Clock className="h-3.5 w-3.5" /> {quest.estimatedTime} · {quest.difficulty}
+          <Clock className="h-3 w-3" /> {quest.estimatedTime} · {quest.difficulty}
         </span>
       </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-2">
+      <div className="mt-3 grid grid-cols-1 gap-2">
         <button
           onClick={() => !completed && onComplete(quest.id, quest.xpReward)}
           disabled={completed}
-          className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all active:scale-[0.98] ${
+          className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] ${
             completed
-              ? "bg-signal/15 text-signal border border-signal/40 cursor-default"
+              ? "bg-signal/10 text-signal border border-signal/30 cursor-default"
               : "bg-signal-gradient text-signal-foreground shadow-glow"
           }`}
         >
@@ -94,10 +91,10 @@ export function QuestCard({ quest, index, saved, completed, onComplete, onToggle
             href={quest.optionalSourceUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-secondary/40 px-4 py-2 text-xs text-muted-foreground hover:text-foreground hover:border-muted-foreground/40 transition"
+            className="inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground transition"
           >
             Optional source: {quest.optionalSourceTitle ?? "Read / Watch"}
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-3 w-3" />
           </a>
         )}
       </div>

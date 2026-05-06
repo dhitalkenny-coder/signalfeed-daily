@@ -26,27 +26,30 @@ function Goals() {
         Pick at least 3 goals. You can change these anytime.
       </p>
 
-      <div className="mt-8 grid grid-cols-2 gap-3">
+      <div className="mt-7 grid grid-cols-2 gap-2.5">
         {CATEGORIES.map((c, i) => {
           const active = selected.includes(c.name);
+          const Icon = c.Icon;
           return (
             <motion.button
               key={c.name}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, delay: i * 0.03 }}
+              transition={{ duration: 0.3, delay: i * 0.025 }}
               onClick={() => toggle(c.name)}
-              className={`relative rounded-2xl border p-4 text-left transition-all ${
+              className={`relative rounded-2xl border p-3.5 text-left transition-all ${
                 active
-                  ? "border-signal bg-signal/10 shadow-glow"
+                  ? "border-signal/70 bg-signal/[0.07] shadow-glow"
                   : "border-border bg-card-gradient hover:border-muted-foreground/40"
               }`}
             >
-              <div className="text-2xl">{c.icon}</div>
-              <div className="mt-2 text-sm font-medium leading-tight">{c.name}</div>
+              <div className={`flex h-9 w-9 items-center justify-center rounded-lg bg-background/60 border border-border ${c.tone}`}>
+                <Icon className="h-4 w-4" strokeWidth={2} />
+              </div>
+              <div className="mt-2.5 text-[13.5px] font-medium leading-tight">{c.name}</div>
               <div className="mt-1 text-[11px] text-muted-foreground leading-snug">{c.blurb}</div>
               {active && (
-                <span className="absolute right-3 top-3 inline-flex h-5 w-5 items-center justify-center rounded-full bg-signal text-signal-foreground">
+                <span className="absolute right-2.5 top-2.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-signal text-signal-foreground">
                   <Check className="h-3 w-3" strokeWidth={3} />
                 </span>
               )}
