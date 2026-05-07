@@ -1,15 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { ArrowRight, Flame, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, Compass, BrainCircuit, Bookmark } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SignalFeed — Become 1% better every day" },
+      { title: "SignalFeed — Still want to scroll? Make it useful." },
       {
         name: "description",
         content:
-          "Pick what you want to improve and get small daily quests for learning, health, creativity, money, AI, confidence, and more.",
+          "Discover useful videos, articles, tools, and ideas — with quick checks so you actually remember what you learn.",
       },
     ],
   }),
@@ -28,23 +28,22 @@ function Landing() {
           className="inline-flex items-center gap-2 rounded-full border border-border bg-card/50 px-3 py-1 text-xs text-muted-foreground backdrop-blur"
         >
           <span className="h-1.5 w-1.5 rounded-full bg-signal animate-pulse" />
-          Your daily self-improvement quest
+          A smarter place to scroll
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.05 }}
-          className="mt-6 text-5xl font-semibold leading-[1.05] tracking-tight text-balance"
+          className="mt-6 text-[44px] font-semibold leading-[1.05] tracking-tight text-balance"
         >
-          Become{" "}
+          Still want to scroll?{" "}
           <span
             className="bg-signal-gradient bg-clip-text"
             style={{ WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", color: "transparent" }}
           >
-            1% better
+            Make it useful.
           </span>
-          <br /> every day.
         </motion.h1>
 
         <motion.p
@@ -53,8 +52,8 @@ function Landing() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="mt-5 text-base leading-relaxed text-muted-foreground"
         >
-          Pick what you want to improve and get small daily quests for learning, health,
-          creativity, money, AI, confidence, and more.
+          Discover useful videos, articles, tools, and ideas — with quick checks so you actually
+          remember what you learn.
         </motion.p>
 
         <motion.div
@@ -64,36 +63,36 @@ function Landing() {
           className="mt-8 flex flex-col gap-3"
         >
           <Link
-            to="/goals"
+            to="/interests"
             className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-signal-gradient px-6 py-4 text-base font-semibold text-signal-foreground shadow-glow transition-transform active:scale-[0.98]"
           >
-            Choose your first goal
+            Start smart scrolling
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
           <Link
-            to="/quests"
+            to="/feed"
             className="text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            See today's quests →
+            Or peek at today's feed →
           </Link>
         </motion.div>
 
         <div className="mt-16 grid gap-3">
           {[
             {
-              icon: Target,
-              title: "Pick a goal. Get a quest.",
-              body: "Choose categories that matter to you. Get small, doable quests every day.",
+              icon: Compass,
+              title: "Pick what you're curious about.",
+              body: "AI, money, creativity, news, philosophy, health, cooking, business — your choice.",
             },
             {
-              icon: Flame,
-              title: "Build the streak.",
-              body: "One quest a day compounds. Miss none, and your week looks different in a month.",
+              icon: BrainCircuit,
+              title: "Learn inside the app.",
+              body: "Each signal teaches the idea right here. A quick check helps it stick.",
             },
             {
-              icon: TrendingUp,
-              title: "Earn XP. Level up.",
-              body: "Each completed quest earns XP. Watch your level climb as your habits do.",
+              icon: Bookmark,
+              title: "Save what's useful.",
+              body: "Keep the good stuff. Optional small actions if you feel like trying one.",
             },
           ].map((f, i) => (
             <motion.div
@@ -111,7 +110,7 @@ function Landing() {
         </div>
 
         <p className="mt-12 text-center text-xs text-muted-foreground">
-          For builders, creators, students, and anyone tired of doomscrolling.
+          Useful scrolling, not doomscrolling.
         </p>
       </div>
     </main>
