@@ -1,9 +1,9 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Flame, Target, Bookmark, TrendingUp } from "lucide-react";
+import { Compass, Sparkles, Bookmark, TrendingUp } from "lucide-react";
 
 const items = [
-  { to: "/quests", label: "Quests", icon: Flame },
-  { to: "/goals", label: "Goals", icon: Target },
+  { to: "/feed", label: "Feed", icon: Compass },
+  { to: "/interests", label: "Interests", icon: Sparkles },
   { to: "/saved", label: "Saved", icon: Bookmark },
   { to: "/progress", label: "Progress", icon: TrendingUp },
 ] as const;

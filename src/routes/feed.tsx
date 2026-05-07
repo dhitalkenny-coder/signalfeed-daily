@@ -8,7 +8,7 @@ import { todayKey } from "@/lib/progress";
 
 export const Route = createFileRoute("/feed")({
   head: () => ({ meta: [{ title: "Smart Feed · SignalFeed" }] }),
-  component: Feed;
+  component: Feed,
 });
 
 function hash(s: string) {
