@@ -101,9 +101,15 @@ export function SignalCard({
         {signal.shortSummary}
       </p>
 
-      {/* Visual placeholder — subtle gradient strip, no heavy block */}
-      <div className={`mt-3 h-20 rounded-xl bg-gradient-to-br from-background/40 to-card border border-border/60 flex items-center justify-center ${meta.tone}`}>
-        <Icon className="h-7 w-7 opacity-60" strokeWidth={1.5} />
+      {/* Category thumbnail — gradient placeholder */}
+      <div className={`relative mt-3 h-24 overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br ${grad}`}>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.06),transparent_60%)]" />
+        <div className="absolute inset-0 flex items-center justify-between px-4">
+          <Icon className={`h-10 w-10 opacity-80 ${meta.tone}`} strokeWidth={1.5} />
+          <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+            {signal.contentType}
+          </span>
+        </div>
       </div>
 
       {/* Learn inside the app */}
