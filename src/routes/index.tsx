@@ -64,16 +64,17 @@ function Landing() {
         >
           <Link
             to="/interests"
-            className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-signal-gradient px-6 py-4 text-base font-semibold text-signal-foreground shadow-glow transition-transform active:scale-[0.98]"
+            className="group inline-flex items-center justify-center gap-2 rounded-xl bg-signal/90 hover:bg-signal px-5 py-3 text-[15px] font-semibold text-signal-foreground shadow-md transition-all active:scale-[0.98]"
           >
             Start smart scrolling
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
           <Link
             to="/feed"
-            className="text-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="group inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card/40 px-4 py-2.5 text-sm text-foreground/85 hover:text-foreground hover:border-signal/40 transition-colors"
           >
-            Or peek at today's feed →
+            Or peek at today's feed
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
         </motion.div>
 

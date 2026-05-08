@@ -38,6 +38,18 @@ export function SignalCard({
   const [picked, setPicked] = useState<number | null>(null);
   const [showCheck, setShowCheck] = useState(false);
 
+  const thumbGradient: Record<string, string> = {
+    "AI & Tech": "from-cyan-500/20 via-sky-500/10 to-transparent",
+    "Money": "from-emerald-500/20 via-teal-500/10 to-transparent",
+    "Creativity": "from-purple-500/20 via-fuchsia-500/10 to-transparent",
+    "News & Current Affairs": "from-slate-400/20 via-slate-500/10 to-transparent",
+    "Mind & Philosophy": "from-indigo-500/20 via-violet-500/10 to-transparent",
+    "Health & Lifestyle": "from-green-500/20 via-emerald-500/10 to-transparent",
+    "Cooking & Skills": "from-orange-500/20 via-amber-500/10 to-transparent",
+    "Business": "from-amber-500/15 via-yellow-500/5 to-transparent",
+  };
+  const grad = thumbGradient[signal.category] ?? "from-signal/15 to-transparent";
+
   const handlePick = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
@@ -89,9 +101,15 @@ export function SignalCard({
         {signal.shortSummary}
       </p>
 
-      {/* Visual placeholder — subtle gradient strip, no heavy block */}
-      <div className={`mt-3 h-20 rounded-xl bg-gradient-to-br from-background/40 to-card border border-border/60 flex items-center justify-center ${meta.tone}`}>
-        <Icon className="h-7 w-7 opacity-60" strokeWidth={1.5} />
+      {/* Category thumbnail — gradient placeholder */}
+      <div className={`relative mt-3 h-24 overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br ${grad}`}>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.06),transparent_60%)]" />
+        <div className="absolute inset-0 flex items-center justify-between px-4">
+          <Icon className={`h-10 w-10 opacity-80 ${meta.tone}`} strokeWidth={1.5} />
+          <span className="text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+            {signal.contentType}
+          </span>
+        </div>
       </div>
 
       {/* Learn inside the app */}
@@ -107,16 +125,25 @@ export function SignalCard({
       </div>
 
       {/* Quick check */}
-      <div className="mt-3 rounded-xl border border-focus/25 bg-focus/[0.05] px-3 py-2.5">
+      <div className="mt-3 rounded-xl border border-focus/30 bg-gradient-to-br from-focus/[0.08] to-focus/[0.02] px-3.5 py-3 shadow-[0_0_0_1px_rgba(56,189,248,0.04)]">
         <button
           onClick={() => setShowCheck((v) => !v)}
-          className="w-full text-left flex items-center justify-between gap-2"
+          className="w-full text-left flex items-center justify-between gap-2 group/qc"
         >
-          <span className="text-[10.5px] font-medium uppercase tracking-widest text-focus flex items-center gap-1.5">
-            <HelpCircle className="h-3 w-3" /> Quick check
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-focus flex items-center gap-1.5">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-focus/15">
+              <HelpCircle className="h-3 w-3" />
+            </span>
+            Quick check
           </span>
-          <span className="text-[11px] text-muted-foreground">
-            {showCheck ? "hide" : answeredCorrect === null ? "tap to answer" : answeredCorrect ? "correct" : "try again"}
+          <span className={`text-[11px] inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition-colors ${
+            answeredCorrect === true
+              ? "bg-signal/15 text-signal"
+              : answeredCorrect === false
+              ? "bg-destructive/15 text-destructive"
+              : "bg-focus/15 text-focus group-hover/qc:bg-focus/25"
+          }`}>
+            {showCheck ? "Hide" : answeredCorrect === null ? "Tap to answer" : answeredCorrect ? "Correct" : "Try again"}
           </span>
         </button>
         <AnimatePresence initial={false}>
@@ -182,30 +209,25 @@ export function SignalCard({
       </div>
 
       {/* Actions */}
-      <div className="mt-3 grid gap-2">
+      <div className="mt-3 flex items-center justify-between gap-3">
         <button
           onClick={() => !learned && onMarkLearned(signal.id)}
           disabled={learned}
-          className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] ${
+          className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[12.5px] font-medium transition-all active:scale-[0.98] ${
             learned
               ? "bg-signal/10 text-signal border border-signal/30 cursor-default"
-              : "bg-signal-gradient text-signal-foreground shadow-glow"
+              : "border border-signal/40 text-signal hover:bg-signal/10"
           }`}
         >
-          {learned ? (
-            <>
-              <Check className="h-4 w-4" /> Learned
-            </>
-          ) : (
-            <>Mark learned</>
-          )}
+          <Check className="h-3.5 w-3.5" />
+          {learned ? "Learned" : "Mark learned"}
         </button>
         {signal.sourceUrl && (
           <a
             href={signal.sourceUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground transition"
+            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition"
           >
             {signal.contentType === "Video" ? "Watch" : "Read"} source
             {signal.sourceName ? `: ${signal.sourceName}` : ""}
