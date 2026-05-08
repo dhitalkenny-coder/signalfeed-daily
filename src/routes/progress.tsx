@@ -63,9 +63,8 @@ function ProgressPage() {
     { icon: Bookmark, label: "Saved", value: savedIds.length },
   ];
 
-  // Light progress bar — every 50 points fills a tier
+  // Light progress bar — every 50 points fills a step
   const tierSize = 50;
-  const tier = Math.floor(points / tierSize) + 1;
   const intoTier = points % tierSize;
   const tierPct = Math.min(100, Math.round((intoTier / tierSize) * 100));
 
