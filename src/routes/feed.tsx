@@ -93,9 +93,7 @@ function Feed() {
         </p>
         <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-card-gradient px-4 py-3 text-sm">
           <span className="text-muted-foreground">Learned today</span>
-          <span className="font-medium">
-            {learnedToday} / {feed.length}
-          </span>
+          <span className="font-medium">{learnedToday}</span>
         </div>
         {!interests.length && (
           <Link
