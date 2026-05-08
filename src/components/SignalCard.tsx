@@ -125,16 +125,25 @@ export function SignalCard({
       </div>
 
       {/* Quick check */}
-      <div className="mt-3 rounded-xl border border-focus/25 bg-focus/[0.05] px-3 py-2.5">
+      <div className="mt-3 rounded-xl border border-focus/30 bg-gradient-to-br from-focus/[0.08] to-focus/[0.02] px-3.5 py-3 shadow-[0_0_0_1px_rgba(56,189,248,0.04)]">
         <button
           onClick={() => setShowCheck((v) => !v)}
-          className="w-full text-left flex items-center justify-between gap-2"
+          className="w-full text-left flex items-center justify-between gap-2 group/qc"
         >
-          <span className="text-[10.5px] font-medium uppercase tracking-widest text-focus flex items-center gap-1.5">
-            <HelpCircle className="h-3 w-3" /> Quick check
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-focus flex items-center gap-1.5">
+            <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-focus/15">
+              <HelpCircle className="h-3 w-3" />
+            </span>
+            Quick check
           </span>
-          <span className="text-[11px] text-muted-foreground">
-            {showCheck ? "hide" : answeredCorrect === null ? "tap to answer" : answeredCorrect ? "correct" : "try again"}
+          <span className={`text-[11px] inline-flex items-center gap-1 rounded-full px-2 py-0.5 transition-colors ${
+            answeredCorrect === true
+              ? "bg-signal/15 text-signal"
+              : answeredCorrect === false
+              ? "bg-destructive/15 text-destructive"
+              : "bg-focus/15 text-focus group-hover/qc:bg-focus/25"
+          }`}>
+            {showCheck ? "Hide" : answeredCorrect === null ? "Tap to answer" : answeredCorrect ? "Correct" : "Try again"}
           </span>
         </button>
         <AnimatePresence initial={false}>
