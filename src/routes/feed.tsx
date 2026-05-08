@@ -4,7 +4,9 @@ import { motion } from "framer-motion";
 import { SignalCard } from "@/components/SignalCard";
 import { DEFAULT_SIGNALS, type Category, type Signal } from "@/lib/signals-data";
 import { useLocalStorage } from "@/lib/use-local-storage";
-import { todayKey } from "@/lib/progress";
+function todayKey(d = new Date()) {
+  return d.toISOString().slice(0, 10);
+}
 
 export const Route = createFileRoute("/feed")({
   head: () => ({ meta: [{ title: "Smart Feed · SignalFeed" }] }),
