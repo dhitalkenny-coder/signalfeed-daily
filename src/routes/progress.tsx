@@ -73,20 +73,24 @@ function ProgressPage() {
     <main className="min-h-screen pb-28 px-5 pt-10 mx-auto max-w-md">
       <header className="mb-6">
         <p className="text-xs uppercase tracking-[0.18em] text-signal">Your progress</p>
-        <h1 className="mt-2 text-[28px] font-semibold tracking-tight">
-          {points} learning points
-        </h1>
+        <h1 className="mt-2 text-[28px] font-semibold tracking-tight">Learning progress</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Tier {tier} · {tierSize - intoTier} points to next tier
+          Keep learning a little each day. It adds up.
         </p>
 
-        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-secondary/60">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${tierPct}%` }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="h-full bg-signal-gradient"
-          />
+        <div className="mt-4">
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
+            <span>{points} learning points</span>
+            <span className="opacity-70">{tierSize - intoTier} to next step</span>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary/50">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${tierPct}%` }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="h-full bg-signal/70"
+            />
+          </div>
         </div>
       </header>
 
