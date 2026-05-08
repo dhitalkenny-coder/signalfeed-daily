@@ -38,6 +38,18 @@ export function SignalCard({
   const [picked, setPicked] = useState<number | null>(null);
   const [showCheck, setShowCheck] = useState(false);
 
+  const thumbGradient: Record<string, string> = {
+    "AI & Tech": "from-cyan-500/20 via-sky-500/10 to-transparent",
+    "Money": "from-emerald-500/20 via-teal-500/10 to-transparent",
+    "Creativity": "from-purple-500/20 via-fuchsia-500/10 to-transparent",
+    "News & Current Affairs": "from-slate-400/20 via-slate-500/10 to-transparent",
+    "Mind & Philosophy": "from-indigo-500/20 via-violet-500/10 to-transparent",
+    "Health & Lifestyle": "from-green-500/20 via-emerald-500/10 to-transparent",
+    "Cooking & Skills": "from-orange-500/20 via-amber-500/10 to-transparent",
+    "Business": "from-amber-500/15 via-yellow-500/5 to-transparent",
+  };
+  const grad = thumbGradient[signal.category] ?? "from-signal/15 to-transparent";
+
   const handlePick = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
