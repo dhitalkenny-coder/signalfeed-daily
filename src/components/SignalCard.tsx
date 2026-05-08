@@ -209,30 +209,25 @@ export function SignalCard({
       </div>
 
       {/* Actions */}
-      <div className="mt-3 grid gap-2">
+      <div className="mt-3 flex items-center justify-between gap-3">
         <button
           onClick={() => !learned && onMarkLearned(signal.id)}
           disabled={learned}
-          className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] ${
+          className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[12.5px] font-medium transition-all active:scale-[0.98] ${
             learned
               ? "bg-signal/10 text-signal border border-signal/30 cursor-default"
-              : "bg-signal-gradient text-signal-foreground shadow-glow"
+              : "border border-signal/40 text-signal hover:bg-signal/10"
           }`}
         >
-          {learned ? (
-            <>
-              <Check className="h-4 w-4" /> Learned
-            </>
-          ) : (
-            <>Mark learned</>
-          )}
+          <Check className="h-3.5 w-3.5" />
+          {learned ? "Learned" : "Mark learned"}
         </button>
         {signal.sourceUrl && (
           <a
             href={signal.sourceUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground transition"
+            className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition"
           >
             {signal.contentType === "Video" ? "Watch" : "Read"} source
             {signal.sourceName ? `: ${signal.sourceName}` : ""}
