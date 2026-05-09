@@ -92,6 +92,7 @@ export interface Signal {
   contentType: ContentType;
   sourceName?: string;
   sourceUrl?: string;
+  videoUrl?: string;
   shortSummary: string;
   learnInsideApp: string;
   whyItMatters: string;
@@ -509,3 +510,22 @@ export const DEFAULT_SIGNALS: Signal[] = [
     "Compare your (or a favorite product's) price to its 3 closest alternatives.",
     "15 min", "Medium", ["pricing", "positioning"]),
 ];
+
+// Attach real YouTube embed URLs to specific signals so the feed has
+// rich video cards out of the box. These are the curated, working URLs.
+const VIDEO_URLS: Record<string, string> = {
+  "ai-3": "https://www.youtube.com/embed/zjkBMFhNj_g", // Karpathy — Intro to LLMs
+  "mo-1": "https://www.youtube.com/embed/THNkf02fBNI", // George Kamel — Stop wasting money
+  "ph-1": "https://www.youtube.com/embed/EFkyxzJtiv4", // Einzelgänger — Stoicism
+  "cr-1": "https://www.youtube.com/embed/o9t9R7Zn7C0", // Struthless — Rule of thirds
+  "he-2": "https://www.youtube.com/embed/h2aWYjSA1Jc", // Huberman — Morning routine
+  "ck-3": "https://www.youtube.com/embed/YEWhMQpBYS0", // Joshua Weissman — Quick skill
+};
+
+for (const sig of DEFAULT_SIGNALS) {
+  const v = VIDEO_URLS[sig.id];
+  if (v) {
+    sig.videoUrl = v;
+    sig.contentType = "Video";
+  }
+}

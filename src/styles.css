@@ -42,41 +42,41 @@
 
 :root {
   --radius: 0.875rem;
-  /* Force dark — premium calm UI */
-  --background: oklch(0.16 0.018 240);
+  /* Force dark — premium video-first UI */
+  --background: #070B10;
   --foreground: oklch(0.97 0.008 240);
-  --card: oklch(0.215 0.018 240);
+  --card: #111820;
   --card-foreground: oklch(0.97 0.008 240);
-  --popover: oklch(0.215 0.018 240);
+  --popover: #111820;
   --popover-foreground: oklch(0.97 0.008 240);
-  /* Growth green primary */
-  --primary: oklch(0.78 0.16 155);
-  --primary-foreground: oklch(0.16 0.03 155);
-  --secondary: oklch(0.26 0.018 240);
+  /* Growth green primary #35D07F */
+  --primary: #35D07F;
+  --primary-foreground: #06120B;
+  --secondary: #1A2330;
   --secondary-foreground: oklch(0.97 0.008 240);
-  --muted: oklch(0.235 0.014 240);
+  --muted: #161E28;
   --muted-foreground: oklch(0.7 0.02 240);
-  --accent: oklch(0.28 0.022 240);
+  --accent: #1E2A38;
   --accent-foreground: oklch(0.97 0.008 240);
   --destructive: oklch(0.62 0.22 27);
   --destructive-foreground: oklch(0.98 0.005 240);
-  --border: oklch(0.3 0.022 240);
-  --input: oklch(0.26 0.018 240);
-  --ring: oklch(0.78 0.16 155);
+  --border: #1F2A36;
+  --input: #1A2330;
+  --ring: #35D07F;
   /* Signal = growth green */
-  --signal: oklch(0.78 0.16 155);
-  --signal-foreground: oklch(0.16 0.03 155);
+  --signal: #35D07F;
+  --signal-foreground: #06120B;
   /* Reward gold (small accents only) */
   --gold: oklch(0.84 0.14 88);
   /* Focus blue */
   --focus: oklch(0.78 0.13 230);
 
-  --gradient-hero: radial-gradient(ellipse at top, oklch(0.42 0.14 155 / 0.22), transparent 60%),
-                    linear-gradient(180deg, oklch(0.18 0.018 240), oklch(0.13 0.014 240));
-  --gradient-card: linear-gradient(160deg, oklch(0.225 0.02 240), oklch(0.19 0.016 240));
-  --gradient-signal: linear-gradient(135deg, oklch(0.78 0.16 155), oklch(0.72 0.17 150));
-  --shadow-elegant: 0 20px 50px -20px oklch(0 0 0 / 0.6);
-  --shadow-glow: 0 0 50px -12px oklch(0.78 0.16 155 / 0.35);
+  --gradient-hero: radial-gradient(ellipse at top, color-mix(in oklab, #35D07F 18%, transparent), transparent 60%),
+                    linear-gradient(180deg, #0A1118, #070B10);
+  --gradient-card: linear-gradient(160deg, #131C26, #0E1620);
+  --gradient-signal: linear-gradient(135deg, #35D07F, #2BB46C);
+  --shadow-elegant: 0 20px 50px -20px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 50px -12px rgba(53, 208, 127, 0.35);
 }
 
 @layer base {
