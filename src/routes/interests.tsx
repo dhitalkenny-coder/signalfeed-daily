@@ -17,13 +17,16 @@ function Interests() {
     setSelected((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
 
   return (
-    <main className="min-h-screen pb-36 px-6 pt-12 mx-auto max-w-md">
+    <main className="min-h-[100dvh] pb-36 px-6 pt-12 mx-auto max-w-md">
       <p className="text-xs uppercase tracking-[0.18em] text-signal">Step 01</p>
       <h1 className="mt-2 text-[28px] font-semibold tracking-tight text-balance">
         What do you want to scroll?
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Pick at least 2. Your feed sharpens around what you choose.
+        Your feed sharpens around what you choose.
+      </p>
+      <p className="mt-1 text-[12px] text-muted-foreground/80">
+        Pick at least 2 categories.
       </p>
 
       <div className="mt-6 grid gap-2.5">
@@ -69,9 +72,9 @@ function Interests() {
           <button
             disabled={selected.length < 2}
             onClick={() => navigate({ to: "/feed" })}
-            className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-signal-gradient px-6 py-4 text-base font-semibold text-signal-foreground shadow-glow transition-all disabled:opacity-40 disabled:shadow-none active:scale-[0.98]"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-signal px-6 py-4 text-base font-semibold text-signal-foreground shadow-md transition-all disabled:opacity-40 disabled:shadow-none active:scale-[0.98] hover:bg-signal/90"
           >
-            {selected.length < 2 ? `Pick ${2 - selected.length} more` : "Start smart scrolling"}
+            {selected.length < 2 ? `Pick ${2 - selected.length} more` : "Open my feed"}
             <ArrowRight className="h-4 w-4" />
           </button>
         </div>

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { motion } from "framer-motion";
-import { Flame, Sparkles, CheckCircle2, HelpCircle, Bookmark } from "lucide-react";
+import { Flame, Sparkles, CheckCircle2, Eye, Bookmark } from "lucide-react";
 import { useLocalStorage } from "@/lib/use-local-storage";
 import { DEFAULT_SIGNALS, type Signal, CATEGORIES } from "@/lib/signals-data";
 import type { QuizAnswer } from "./feed";
@@ -32,8 +32,7 @@ function computeStreak(records: { at: string }[]) {
 }
 
 function ProgressPage() {
-  const [points] = useLocalStorage<number>("sf:points", 0);
-  const [learned] = useLocalStorage<{ id: string; at: string }[]>("sf:learned", []);
+  const [watched] = useLocalStorage<{ id: string; at: string }[]>("sf:watched", []);
   const [answers] = useLocalStorage<QuizAnswer[]>("sf:answers", []);
   const [savedIds] = useLocalStorage<string[]>("sf:saved", []);
   const [customSignals] = useLocalStorage<Signal[]>("sf:custom-signals", []);
@@ -41,56 +40,40 @@ function ProgressPage() {
   const all = useMemo(() => [...customSignals, ...DEFAULT_SIGNALS], [customSignals]);
   const byId = useMemo(() => new Map(all.map((s) => [s.id, s])), [all]);
 
-  const streak = computeStreak(learned);
+  const streak = computeStreak(watched);
   const correctCount = answers.filter((a) => a.correct).length;
+  const today = todayKey();
+  const reelsWatchedToday = new Set(
+    watched.filter((w) => w.at.slice(0, 10) === today).map((w) => w.id),
+  ).size;
 
   const perCategory = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const l of learned) {
-      const sig = byId.get(l.id);
+    for (const w of watched) {
+      const sig = byId.get(w.id);
       if (!sig) continue;
       counts.set(sig.category, (counts.get(sig.category) ?? 0) + 1);
     }
     return CATEGORIES.map((c) => ({ ...c, count: counts.get(c.name) ?? 0 })).sort(
       (a, b) => b.count - a.count,
     );
-  }, [learned, byId]);
+  }, [watched, byId]);
 
   const stats = [
+    { icon: Eye, label: "Reels watched today", value: reelsWatchedToday },
+    { icon: CheckCircle2, label: "Correct answers", value: correctCount },
     { icon: Flame, label: "Streak", value: `${streak}d` },
-    { icon: CheckCircle2, label: "Learned", value: learned.length },
-    { icon: HelpCircle, label: "Quick checks", value: `${correctCount}/${answers.length}` },
     { icon: Bookmark, label: "Saved", value: savedIds.length },
   ];
 
-  // Light progress bar — every 50 points fills a step
-  const tierSize = 50;
-  const intoTier = points % tierSize;
-  const tierPct = Math.min(100, Math.round((intoTier / tierSize) * 100));
-
   return (
-    <main className="min-h-screen pb-28 px-5 pt-10 mx-auto max-w-md">
+    <main className="min-h-[100dvh] pb-28 px-5 pt-10 mx-auto max-w-md">
       <header className="mb-6">
         <p className="text-xs uppercase tracking-[0.18em] text-signal">Your progress</p>
         <h1 className="mt-2 text-[28px] font-semibold tracking-tight">Learning progress</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Keep learning a little each day. It adds up.
+          A little useful scrolling, every day.
         </p>
-
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-[11px] text-muted-foreground mb-1.5">
-            <span>{points} learning points</span>
-            <span className="opacity-70">{tierSize - intoTier} to next step</span>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary/50">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${tierPct}%` }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-              className="h-full bg-signal/70"
-            />
-          </div>
-        </div>
       </header>
 
       <div className="grid grid-cols-2 gap-3">
@@ -117,10 +100,7 @@ function ProgressPage() {
           {perCategory.map((c) => {
             const Icon = c.Icon;
             return (
-              <div
-                key={c.name}
-                className="flex items-center justify-between px-3.5 py-2.5"
-              >
+              <div key={c.name} className="flex items-center justify-between px-3.5 py-2.5">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <span className={`inline-flex h-6 w-6 items-center justify-center rounded-md bg-background/60 border border-border ${c.tone}`}>
                     <Icon className="h-3.5 w-3.5" strokeWidth={2} />
@@ -128,7 +108,7 @@ function ProgressPage() {
                   <span className="text-[13px] font-medium truncate">{c.name}</span>
                 </div>
                 <span className="text-[11px] text-muted-foreground shrink-0">
-                  {c.count} learned
+                  {c.count} watched
                 </span>
               </div>
             );
@@ -136,12 +116,12 @@ function ProgressPage() {
         </div>
       </section>
 
-      {learned.length === 0 && (
+      {watched.length === 0 && (
         <div className="mt-8 rounded-2xl border border-dashed border-border p-6 text-center">
           <Sparkles className="mx-auto h-6 w-6 text-signal" />
-          <p className="mt-3 text-sm font-medium">Nothing learned yet</p>
+          <p className="mt-3 text-sm font-medium">No reels yet</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Mark a signal as learned to start your streak.
+            Watch a reel and answer a quick check to start your streak.
           </p>
           <Link
             to="/feed"
