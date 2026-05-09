@@ -1,15 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { motion } from "framer-motion";
-import { SignalCard } from "@/components/SignalCard";
+import { Reel } from "@/components/Reel";
 import { DEFAULT_SIGNALS, type Category, type Signal } from "@/lib/signals-data";
 import { useLocalStorage } from "@/lib/use-local-storage";
-function todayKey(d = new Date()) {
-  return d.toISOString().slice(0, 10);
-}
 
 export const Route = createFileRoute("/feed")({
-  head: () => ({ meta: [{ title: "Smart Feed · SignalFeed" }] }),
+  head: () => ({ meta: [{ title: "Feed · SignalFeed" }] }),
   component: Feed,
 });
 
@@ -18,20 +14,20 @@ function hash(s: string) {
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
   return h;
 }
+function todayKey(d = new Date()) {
+  return d.toISOString().slice(0, 10);
+}
 
-function pickFeed(all: Signal[], interests: Category[], n = 14) {
+function pickFeed(all: Signal[], interests: Category[]) {
   const pool = interests.length ? all.filter((s) => interests.includes(s.category)) : all;
   const source = pool.length ? pool : all;
   const seed = todayKey();
-  return source
-    .map((s) => ({ s, k: hash(s.id + seed) }))
-    .sort((a, b) => a.k - b.k)
-    .map((x) => x.s)
-    .slice(0, n);
+  return [...source].sort((a, b) => hash(a.id + seed) - hash(b.id + seed));
 }
 
 export interface QuizAnswer {
-  id: string;
+  id: string;       // signal id
+  qIndex: number;   // question index
   picked: number;
   correct: boolean;
   at: string;
@@ -42,17 +38,12 @@ function Feed() {
   const [savedIds, setSavedIds] = useLocalStorage<string[]>("sf:saved", []);
   const [learned, setLearned] = useLocalStorage<{ id: string; at: string }[]>("sf:learned", []);
   const [answers, setAnswers] = useLocalStorage<QuizAnswer[]>("sf:answers", []);
-  const [points, setPoints] = useLocalStorage<number>("sf:points", 0);
+  const [watched, setWatched] = useLocalStorage<{ id: string; at: string }[]>("sf:watched", []);
   const [customSignals] = useLocalStorage<Signal[]>("sf:custom-signals", []);
 
   const all = useMemo(() => [...customSignals, ...DEFAULT_SIGNALS], [customSignals]);
-  const feed = useMemo(() => pickFeed(all, interests, 14), [all, interests]);
+  const feed = useMemo(() => pickFeed(all, interests), [all, interests]);
   const learnedIds = useMemo(() => new Set(learned.map((l) => l.id)), [learned]);
-  const answerMap = useMemo(() => {
-    const m = new Map<string, boolean>();
-    for (const a of answers) m.set(a.id, a.correct);
-    return m;
-  }, [answers]);
 
   const toggleSave = (id: string) =>
     setSavedIds((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
@@ -60,73 +51,49 @@ function Feed() {
   const markLearned = (id: string) => {
     if (learnedIds.has(id)) return;
     setLearned((p) => [...p, { id, at: new Date().toISOString() }]);
-    setPoints((p) => p + 5);
+    setWatched((p) =>
+      p.some((w) => w.id === id) ? p : [...p, { id, at: new Date().toISOString() }],
+    );
   };
 
-  const onAnswer = (id: string, picked: number, correct: boolean) => {
+  const onAnswer = (id: string, qIndex: number, picked: number, correct: boolean) => {
     setAnswers((prev) => {
-      if (prev.some((a) => a.id === id)) return prev;
-      return [...prev, { id, picked, correct, at: new Date().toISOString() }];
+      if (prev.some((a) => a.id === id && a.qIndex === qIndex && a.correct)) return prev;
+      return [...prev, { id, qIndex, picked, correct, at: new Date().toISOString() }];
     });
-    if (correct) setPoints((p) => p + 2);
+    setWatched((p) =>
+      p.some((w) => w.id === id) ? p : [...p, { id, at: new Date().toISOString() }],
+    );
   };
-
-  const today = new Date().toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-  });
-  const learnedToday = feed.filter((s) => learnedIds.has(s.id)).length;
 
   return (
-    <main className="min-h-screen pb-28 px-5 pt-10 mx-auto max-w-md">
-      <motion.header
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-5"
+    <main
+      className="fixed inset-0 overflow-y-scroll bg-background"
+      style={{ scrollSnapType: "y mandatory", overscrollBehaviorY: "contain" }}
+    >
+      {feed.map((signal) => (
+        <Reel
+          key={signal.id}
+          signal={signal}
+          saved={savedIds.includes(signal.id)}
+          learned={learnedIds.has(signal.id)}
+          onToggleSave={toggleSave}
+          onMarkLearned={markLearned}
+          onAnswer={onAnswer}
+        />
+      ))}
+      {/* End sentinel */}
+      <section
+        className="relative h-[100dvh] w-full snap-start flex items-center justify-center px-8"
+        style={{ scrollSnapAlign: "start" }}
       >
-        <p className="text-xs uppercase tracking-[0.18em] text-signal">{today}</p>
-        <h1 className="mt-2 text-[28px] font-semibold tracking-tight">Smart Feed</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Useful signals to scroll, learn, and remember.
-        </p>
-        <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-card-gradient px-4 py-3 text-sm">
-          <span className="text-muted-foreground">Learned today</span>
-          <span className="font-medium">{learnedToday}</span>
+        <div className="text-center">
+          <p className="text-base font-medium">That's your feed for today.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Come back tomorrow for fresh reels.
+          </p>
         </div>
-        {!interests.length && (
-          <Link
-            to="/interests"
-            className="mt-2 inline-block text-xs text-signal underline-offset-4 hover:underline"
-          >
-            Pick interests for a sharper feed →
-          </Link>
-        )}
-      </motion.header>
-
-      <div className="grid gap-4">
-        {feed.map((signal, i) => (
-          <SignalCard
-            key={signal.id}
-            signal={signal}
-            index={i}
-            saved={savedIds.includes(signal.id)}
-            learned={learnedIds.has(signal.id)}
-            answeredCorrect={answerMap.has(signal.id) ? answerMap.get(signal.id)! : null}
-            onToggleSave={toggleSave}
-            onMarkLearned={markLearned}
-            onAnswer={onAnswer}
-          />
-        ))}
-      </div>
-
-      <div className="mt-10 rounded-2xl border border-border bg-card-gradient p-5 text-center">
-        <p className="text-sm font-medium">That's your feed for today.</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Come back tomorrow for fresh signals · {points} learning points so far
-        </p>
-      </div>
+      </section>
     </main>
   );
 }

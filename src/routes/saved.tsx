@@ -1,10 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { Bookmark } from "lucide-react";
-import { SignalCard } from "@/components/SignalCard";
-import { DEFAULT_SIGNALS, type Signal } from "@/lib/signals-data";
+import { Bookmark, Play, X } from "lucide-react";
+import { CATEGORY_META, DEFAULT_SIGNALS, type Signal } from "@/lib/signals-data";
 import { useLocalStorage } from "@/lib/use-local-storage";
-import type { QuizAnswer } from "./feed";
 
 export const Route = createFileRoute("/saved")({
   head: () => ({ meta: [{ title: "Saved · SignalFeed" }] }),
@@ -14,41 +12,18 @@ export const Route = createFileRoute("/saved")({
 function Saved() {
   const [savedIds, setSavedIds] = useLocalStorage<string[]>("sf:saved", []);
   const [customSignals] = useLocalStorage<Signal[]>("sf:custom-signals", []);
-  const [learned, setLearned] = useLocalStorage<{ id: string; at: string }[]>("sf:learned", []);
-  const [answers, setAnswers] = useLocalStorage<QuizAnswer[]>("sf:answers", []);
-  const [, setPoints] = useLocalStorage<number>("sf:points", 0);
 
   const all = useMemo(() => [...customSignals, ...DEFAULT_SIGNALS], [customSignals]);
   const saved = useMemo(() => all.filter((s) => savedIds.includes(s.id)), [all, savedIds]);
-  const learnedIds = useMemo(() => new Set(learned.map((l) => l.id)), [learned]);
-  const answerMap = useMemo(() => {
-    const m = new Map<string, boolean>();
-    for (const a of answers) m.set(a.id, a.correct);
-    return m;
-  }, [answers]);
 
-  const toggleSave = (id: string) =>
-    setSavedIds((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
-
-  const markLearned = (id: string) => {
-    if (learnedIds.has(id)) return;
-    setLearned((p) => [...p, { id, at: new Date().toISOString() }]);
-    setPoints((p) => p + 5);
-  };
-
-  const onAnswer = (id: string, picked: number, correct: boolean) => {
-    setAnswers((prev) => {
-      if (prev.some((a) => a.id === id)) return prev;
-      return [...prev, { id, picked, correct, at: new Date().toISOString() }];
-    });
-    if (correct) setPoints((p) => p + 2);
-  };
+  const remove = (id: string) =>
+    setSavedIds((p) => p.filter((x) => x !== id));
 
   return (
-    <main className="min-h-screen pb-28 px-5 pt-10 mx-auto max-w-md">
+    <main className="min-h-[100dvh] pb-28 px-5 pt-10 mx-auto max-w-md">
       <header className="mb-6">
         <p className="text-xs uppercase tracking-[0.18em] text-signal">Library</p>
-        <h1 className="mt-2 text-[28px] font-semibold tracking-tight">Saved signals</h1>
+        <h1 className="mt-2 text-[28px] font-semibold tracking-tight">Saved reels</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {saved.length} saved for later
         </p>
@@ -59,7 +34,7 @@ function Saved() {
           <Bookmark className="mx-auto h-8 w-8 text-muted-foreground" />
           <p className="mt-4 text-sm font-medium">Nothing saved yet</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Tap the bookmark on any signal to save it for later.
+            Tap the bookmark on any reel to save it.
           </p>
           <Link
             to="/feed"
@@ -69,21 +44,64 @@ function Saved() {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {saved.map((signal, i) => (
-            <SignalCard
-              key={signal.id}
-              signal={signal}
-              index={i}
-              saved
-              learned={learnedIds.has(signal.id)}
-              answeredCorrect={answerMap.has(signal.id) ? answerMap.get(signal.id)! : null}
-              onToggleSave={toggleSave}
-              onMarkLearned={markLearned}
-              onAnswer={onAnswer}
-            />
-          ))}
-        </div>
+        <ul className="grid gap-3">
+          {saved.map((s) => {
+            const meta = CATEGORY_META[s.category];
+            const Icon = meta.Icon;
+            return (
+              <li
+                key={s.id}
+                className="group relative flex gap-3 rounded-2xl border border-border bg-card overflow-hidden"
+              >
+                <Link
+                  to="/feed"
+                  className={`relative h-24 w-28 shrink-0 bg-gradient-to-br ${meta.gradient}`}
+                  aria-label={`Watch ${s.title}`}
+                >
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    {s.videoUrl ? (
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-signal text-signal-foreground">
+                        <Play className="h-4 w-4 ml-0.5" fill="currentColor" strokeWidth={0} />
+                      </span>
+                    ) : (
+                      <Icon className={`h-7 w-7 ${meta.tone}`} strokeWidth={1.6} />
+                    )}
+                  </div>
+                </Link>
+                <div className="flex-1 min-w-0 py-2.5 pr-2.5">
+                  <p className="text-[13.5px] font-medium leading-snug line-clamp-2">
+                    {s.title}
+                  </p>
+                  <p className="mt-1 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
+                    {s.category} · {s.contentType}
+                  </p>
+                  {s.sourceName && (
+                    <p className="mt-0.5 text-[11px] text-muted-foreground/80 truncate">
+                      {s.sourceName}
+                    </p>
+                  )}
+                  <div className="mt-1.5 flex items-center gap-2">
+                    <Link
+                      to="/feed"
+                      className="inline-flex items-center gap-1 rounded-md border border-signal/40 bg-signal/10 px-2 py-1 text-[11px] text-signal hover:bg-signal/15 transition"
+                    >
+                      <Play className="h-3 w-3" fill="currentColor" strokeWidth={0} />
+                      Watch
+                    </Link>
+                    <button
+                      onClick={() => remove(s.id)}
+                      className="inline-flex items-center gap-1 rounded-md border border-border bg-background/40 px-2 py-1 text-[11px] text-muted-foreground hover:text-foreground transition"
+                      aria-label="Remove from saved"
+                    >
+                      <X className="h-3 w-3" />
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
     </main>
   );
