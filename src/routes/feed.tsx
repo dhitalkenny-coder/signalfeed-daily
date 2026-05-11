@@ -71,12 +71,13 @@ function Feed() {
       className="fixed inset-0 overflow-y-scroll bg-background"
       style={{ scrollSnapType: "y mandatory", overscrollBehaviorY: "contain" }}
     >
-      {feed.map((signal) => (
+      {feed.map((signal, i) => (
         <Reel
           key={signal.id}
           signal={signal}
           saved={savedIds.includes(signal.id)}
           learned={learnedIds.has(signal.id)}
+          showSwipeHint={i === 0}
           onToggleSave={toggleSave}
           onMarkLearned={markLearned}
           onAnswer={onAnswer}

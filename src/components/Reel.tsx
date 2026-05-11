@@ -16,6 +16,7 @@ interface Props {
   signal: Signal;
   saved: boolean;
   learned: boolean;
+  showSwipeHint?: boolean;
   onToggleSave: (id: string) => void;
   onMarkLearned: (id: string) => void;
   onAnswer: (id: string, qIndex: number, picked: number, correct: boolean) => void;
@@ -25,21 +26,23 @@ export function Reel({
   signal,
   saved,
   learned,
+  showSwipeHint,
   onToggleSave,
   onMarkLearned,
   onAnswer,
 }: Props) {
   const meta = CATEGORY_META[signal.category];
   const Icon = meta.Icon;
-  const isVideo = !!signal.videoUrl;
+  const isVideo = !!signal.youtubeEmbedUrl;
 
   const [playVideo, setPlayVideo] = useState(false);
+  const [embedFailed, setEmbedFailed] = useState(false);
   const [qIndex, setQIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [shake, setShake] = useState(false);
   const [showDeeper, setShowDeeper] = useState(false);
-  // results[i] = true if answered correct
   const [results, setResults] = useState<boolean[]>([]);
+  const [hintVisible, setHintVisible] = useState(!!showSwipeHint);
   const advanceTimer = useRef<number | null>(null);
 
   const current = signal.questions[qIndex];
@@ -52,17 +55,22 @@ export function Reel({
     };
   }, []);
 
+  useEffect(() => {
+    if (!showSwipeHint) return;
+    const t = window.setTimeout(() => setHintVisible(false), 3500);
+    return () => window.clearTimeout(t);
+  }, [showSwipeHint]);
+
   const handlePick = (i: number) => {
     if (picked !== null) return;
     setPicked(i);
-    const correct = i === current.correct;
+    const correct = i === current.correctAnswer;
     onAnswer(signal.id, qIndex, i, correct);
     if (!correct) {
       setShake(true);
       window.setTimeout(() => setShake(false), 350);
       return;
     }
-    // correct -> advance after 1s
     advanceTimer.current = window.setTimeout(() => {
       setResults((r) => [...r, true]);
       setPicked(null);
@@ -72,26 +80,30 @@ export function Reel({
 
   const retry = () => setPicked(null);
 
+  const watchOnYouTubeUrl = signal.sourceUrl
+    ?? (signal.youtubeEmbedUrl ? signal.youtubeEmbedUrl.replace("/embed/", "/watch?v=").split("?")[0] : undefined);
+
   return (
     <section
       className="relative h-[100dvh] w-full snap-start snap-always overflow-hidden bg-background"
       style={{ scrollSnapAlign: "start" }}
     >
-      {/* Video / visual area — 55% */}
-      <div className="relative w-full" style={{ height: "55dvh" }}>
+      {/* Video / visual area — 60% */}
+      <div className="relative w-full" style={{ height: "60dvh" }}>
         <div className="absolute inset-0 bg-black">
-          {isVideo && playVideo ? (
+          {isVideo && playVideo && !embedFailed ? (
             <iframe
-              src={`${signal.videoUrl}${signal.videoUrl?.includes("?") ? "&" : "?"}autoplay=1`}
+              src={`${signal.youtubeEmbedUrl}${signal.youtubeEmbedUrl?.includes("?") ? "&" : "?"}autoplay=1`}
               title={signal.title}
               className="absolute inset-0 h-full w-full"
               allow="accelerated-sensors; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
+              onError={() => setEmbedFailed(true)}
             />
           ) : (
             <button
               type="button"
-              onClick={() => isVideo && setPlayVideo(true)}
+              onClick={() => isVideo && !embedFailed && setPlayVideo(true)}
               className={`group relative h-full w-full bg-gradient-to-br ${meta.gradient}`}
               aria-label={isVideo ? "Play video" : signal.title}
             >
@@ -105,19 +117,18 @@ export function Reel({
               />
               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.1),transparent_60%)]" />
 
-              {!isVideo && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Icon className={`h-24 w-24 opacity-90 ${meta.tone}`} strokeWidth={1.2} />
-                </div>
-              )}
-
-              {isVideo && (
-                <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center">
+                {isVideo && !embedFailed ? (
                   <span className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-signal text-signal-foreground shadow-glow transition-transform group-hover:scale-105 group-active:scale-95">
                     <Play className="h-9 w-9 ml-0.5" fill="currentColor" strokeWidth={0} />
                   </span>
-                </div>
-              )}
+                ) : (
+                  <Icon className={`h-24 w-24 opacity-90 ${meta.tone}`} strokeWidth={1.2} />
+                )}
+              </div>
+
+              {/* Bottom gradient overlay */}
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
             </button>
           )}
         </div>
@@ -135,33 +146,59 @@ export function Reel({
           )}
         </button>
 
+        {/* Watch on YouTube fallback */}
+        {isVideo && embedFailed && watchOnYouTubeUrl && (
+          <a
+            href={watchOnYouTubeUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-black/65 backdrop-blur px-3 py-1.5 text-[11px] text-white border border-white/10"
+          >
+            <Play className="h-3 w-3" fill="currentColor" strokeWidth={0} />
+            Watch on YouTube
+          </a>
+        )}
+
         {/* Category chip — bottom-left */}
         <div className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-md bg-black/60 backdrop-blur px-2 py-1 text-[10.5px] uppercase tracking-[0.14em] text-white/90 border border-white/10">
           <Icon className={`h-3 w-3 ${meta.tone}`} strokeWidth={2} />
-          {signal.category}
+          {signal.category} · {signal.difficulty}
         </div>
 
         {/* Type chip — bottom-right */}
         <div className="absolute bottom-3 right-3 z-10 inline-flex items-center rounded-md bg-black/60 backdrop-blur px-2 py-1 text-[10.5px] uppercase tracking-[0.14em] text-white/90 border border-white/10">
           {signal.contentType}
         </div>
+
+        {/* Swipe hint */}
+        <AnimatePresence>
+          {hintVisible && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: [0, -6, 0] }}
+              exit={{ opacity: 0 }}
+              transition={{ y: { repeat: Infinity, duration: 1.6 }, opacity: { duration: 0.4 } }}
+              className="pointer-events-none absolute bottom-14 left-1/2 -translate-x-1/2 z-10 rounded-full bg-black/65 backdrop-blur px-3 py-1.5 text-[11px] text-white/90 border border-white/10"
+            >
+              Swipe up for next reel
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Quiz / content area — 45%, includes safe area + nav padding */}
+      {/* Quiz / content area — 40% */}
       <div
-        className="relative flex flex-col px-5 pt-4"
-        style={{ height: "45dvh", paddingBottom: "calc(72px + env(safe-area-inset-bottom))" }}
+        className="relative flex flex-col px-5 pt-3"
+        style={{ height: "40dvh", paddingBottom: "calc(72px + env(safe-area-inset-bottom))" }}
       >
-        {/* Title */}
-        <h2 className="text-[18px] font-semibold leading-tight tracking-tight text-foreground line-clamp-1">
+        <h2 className="text-[17px] font-semibold leading-tight tracking-tight text-foreground line-clamp-1">
           {signal.title}
         </h2>
-        <p className="mt-1 text-[13px] text-muted-foreground line-clamp-1">
+        <p className="mt-0.5 text-[12.5px] text-muted-foreground line-clamp-1">
           {signal.hook}
         </p>
 
-        {/* Question progress */}
-        <div className="mt-2.5 flex items-center gap-1.5">
+        <div className="mt-2 flex items-center gap-1.5">
           {signal.questions.map((_, i) => {
             const done = results[i] === true;
             const active = i === qIndex && !allDone;
@@ -176,8 +213,7 @@ export function Reel({
           })}
         </div>
 
-        {/* Quiz body */}
-        <div className="mt-3 flex-1 min-h-0 flex flex-col">
+        <div className="mt-2.5 flex-1 min-h-0 flex flex-col">
           {!allDone ? (
             <motion.div
               key={qIndex}
@@ -187,7 +223,7 @@ export function Reel({
               className="flex flex-col gap-2 min-h-0"
             >
               <p className="text-[14px] font-medium text-foreground/95 leading-snug">
-                {current.q}
+                {current.question}
               </p>
               <motion.div
                 animate={shake ? { x: [0, -6, 6, -4, 4, 0] } : { x: 0 }}
@@ -196,14 +232,14 @@ export function Reel({
               >
                 {current.options.map((opt, i) => {
                   const isPicked = picked === i;
-                  const isCorrectPick = picked !== null && i === current.correct;
-                  const isWrongPick = isPicked && i !== current.correct;
+                  const isCorrectPick = picked !== null && i === current.correctAnswer;
+                  const isWrongPick = isPicked && i !== current.correctAnswer;
                   return (
                     <button
                       key={i}
                       onClick={() => handlePick(i)}
-                      disabled={picked !== null && (isCorrectPick || picked === current.correct)}
-                      className={`text-left rounded-xl border px-3 py-2.5 text-[13.5px] transition-all active:scale-[0.99] ${
+                      disabled={picked !== null && (isCorrectPick || picked === current.correctAnswer)}
+                      className={`text-left rounded-xl border px-3.5 py-3 text-[14px] transition-all active:scale-[0.99] ${
                         isCorrectPick
                           ? "border-signal/70 bg-signal/15 text-foreground"
                           : isWrongPick
@@ -221,7 +257,7 @@ export function Reel({
               </motion.div>
 
               <AnimatePresence>
-                {picked !== null && picked === current.correct && (
+                {picked !== null && picked === current.correctAnswer && (
                   <motion.p
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -231,7 +267,7 @@ export function Reel({
                     {current.explanation}
                   </motion.p>
                 )}
-                {picked !== null && picked !== current.correct && (
+                {picked !== null && picked !== current.correctAnswer && (
                   <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -253,14 +289,11 @@ export function Reel({
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex flex-col gap-3"
+              className="flex flex-col gap-2.5"
             >
-              <div className="rounded-xl border border-signal/40 bg-signal/10 px-3.5 py-3">
+              <div className="rounded-xl border border-signal/40 bg-signal/10 px-3.5 py-2.5">
                 <p className="text-[13.5px] font-medium text-signal">
-                  Nice work — marked to memory.
-                </p>
-                <p className="mt-0.5 text-[12px] text-muted-foreground">
-                  Swipe up for the next reel.
+                  Nice — saved to memory.
                 </p>
               </div>
               <button
@@ -279,9 +312,8 @@ export function Reel({
           )}
         </div>
 
-        {/* Go deeper — tiny, collapsed */}
-        {signal.sourceUrl && (
-          <div className="mt-2">
+        {(signal.sourceUrl || watchOnYouTubeUrl) && (
+          <div className="mt-1.5">
             <button
               onClick={() => setShowDeeper((v) => !v)}
               className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition"
@@ -298,13 +330,13 @@ export function Reel({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  href={signal.sourceUrl}
+                  href={signal.sourceUrl ?? watchOnYouTubeUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-1.5 flex items-center justify-between gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5 hover:border-muted-foreground/40 transition overflow-hidden"
                 >
                   <span className="text-[12px] text-foreground/85 truncate">
-                    {signal.sourceName ?? signal.sourceUrl}
+                    {signal.sourceName ?? "Open source"}
                   </span>
                   <span className="shrink-0 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
                     Open

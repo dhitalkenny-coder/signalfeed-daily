@@ -59,7 +59,7 @@ function Saved() {
                   aria-label={`Watch ${s.title}`}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
-                    {s.videoUrl ? (
+                    {s.youtubeEmbedUrl ? (
                       <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-signal text-signal-foreground">
                         <Play className="h-4 w-4 ml-0.5" fill="currentColor" strokeWidth={0} />
                       </span>
@@ -73,7 +73,7 @@ function Saved() {
                     {s.title}
                   </p>
                   <p className="mt-1 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
-                    {s.category} · {s.contentType}
+                    {s.category} · {s.difficulty} · {s.contentType}
                   </p>
                   {s.sourceName && (
                     <p className="mt-0.5 text-[11px] text-muted-foreground/80 truncate">
