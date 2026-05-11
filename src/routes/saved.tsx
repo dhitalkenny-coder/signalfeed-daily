@@ -73,7 +73,7 @@ function Saved() {
                     {s.title}
                   </p>
                   <p className="mt-1 text-[10.5px] uppercase tracking-[0.14em] text-muted-foreground">
-                    {s.category} · {s.contentType}
+                    {s.category} · {s.difficulty} · {s.contentType}
                   </p>
                   {s.sourceName && (
                     <p className="mt-0.5 text-[11px] text-muted-foreground/80 truncate">
