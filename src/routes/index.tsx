@@ -71,7 +71,7 @@ function Landing() {
             to="/interests"
             className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border bg-card/40 px-4 py-2.5 text-sm text-foreground/85 hover:text-foreground hover:border-signal/40 transition-colors"
           >
-            Choose your interests first
+            Choose your interests
           </Link>
         </motion.div>
 
@@ -79,7 +79,7 @@ function Landing() {
           {[
             { icon: Play, title: "Watch useful reels.", body: "One full-screen reel at a time. No garbage in between." },
             { icon: HelpCircle, title: "Answer quick questions.", body: "Two or three taps prove you actually got it." },
-            { icon: Brain, title: "Actually remember what you learned.", body: "Save the gold. Build a real library, not noise." },
+            { icon: Brain, title: "Build progress slowly.", body: "Save the gold. Level up the lanes you actually care about." },
           ].map((f, i) => (
             <motion.div
               key={f.title}
