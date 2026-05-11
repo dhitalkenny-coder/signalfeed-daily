@@ -1,8 +1,15 @@
 {
+  "buildCommand": "npm run build",
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/api"
     }
-  ]
+  ],
+  "functions": {
+    "api/index.ts": {
+      "runtime": "nodejs22.x",
+      "maxDuration": 30
+    }
+  }
 }
