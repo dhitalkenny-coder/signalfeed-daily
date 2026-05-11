@@ -122,7 +122,7 @@ export const DEFAULT_SIGNALS: Signal[] = [
     category: "Skills",
     difficulty: "Beginner",
     contentType: "Shorts",
-    youtubeEmbedUrl: "https://www.youtube.com/embed/qbIk7-JPge0?rel=0&modestbranding=1&playsinline=1",
+    youtubeEmbedUrl: "https://www.youtube-nocookie.com/embed/qbIk7-JPge0?rel=0&modestbranding=1&playsinline=1",
     sourceName: "YouTube",
     sourceUrl: "https://www.youtube.com/watch?v=qbIk7-JPge0",
     questions: [
@@ -148,7 +148,7 @@ export const DEFAULT_SIGNALS: Signal[] = [
     category: "Wealth",
     difficulty: "Beginner",
     contentType: "Shorts",
-    youtubeEmbedUrl: "https://www.youtube.com/embed/7Lm4kDQaYiA?rel=0&modestbranding=1&playsinline=1",
+    youtubeEmbedUrl: "https://www.youtube-nocookie.com/embed/7Lm4kDQaYiA?rel=0&modestbranding=1&playsinline=1",
     sourceName: "YouTube",
     sourceUrl: "https://www.youtube.com/watch?v=7Lm4kDQaYiA",
     questions: [
@@ -174,7 +174,7 @@ export const DEFAULT_SIGNALS: Signal[] = [
     category: "Mind",
     difficulty: "Beginner",
     contentType: "Shorts",
-    youtubeEmbedUrl: "https://www.youtube.com/embed/LBNNSCAgvEY?rel=0&modestbranding=1&playsinline=1",
+    youtubeEmbedUrl: "https://www.youtube-nocookie.com/embed/LBNNSCAgvEY?rel=0&modestbranding=1&playsinline=1",
     sourceName: "YouTube",
     sourceUrl: "https://www.youtube.com/watch?v=LBNNSCAgvEY",
     questions: [
@@ -204,7 +204,7 @@ export const DEFAULT_SIGNALS: Signal[] = [
     category: "Create",
     difficulty: "Beginner",
     contentType: "Shorts",
-    youtubeEmbedUrl: "https://www.youtube.com/embed/hJDiQf3Sqoc?rel=0&modestbranding=1&playsinline=1",
+    youtubeEmbedUrl: "https://www.youtube-nocookie.com/embed/hJDiQf3Sqoc?rel=0&modestbranding=1&playsinline=1",
     sourceName: "YouTube",
     sourceUrl: "https://www.youtube.com/watch?v=hJDiQf3Sqoc",
     questions: [
@@ -230,7 +230,7 @@ export const DEFAULT_SIGNALS: Signal[] = [
     category: "Body",
     difficulty: "Beginner",
     contentType: "Shorts",
-    youtubeEmbedUrl: "https://www.youtube.com/embed/kFUjkfhPCk4?rel=0&modestbranding=1&playsinline=1",
+    youtubeEmbedUrl: "https://www.youtube-nocookie.com/embed/kFUjkfhPCk4?rel=0&modestbranding=1&playsinline=1",
     sourceName: "YouTube",
     sourceUrl: "https://www.youtube.com/watch?v=kFUjkfhPCk4",
     questions: [

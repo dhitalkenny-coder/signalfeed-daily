@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Bookmark,
@@ -22,6 +22,63 @@ interface Props {
   onAnswer: (id: string, qIndex: number, picked: number, correct: boolean) => void;
 }
 
+const YOUTUBE_ID_REGEX = /^[A-Za-z0-9_-]{11}$/;
+const CATEGORY_FALLBACK_GRADIENT: Record<Signal["category"], string> = {
+  Mind: "from-[#312E81] via-[#4338CA] to-[#0F172A]",
+  Body: "from-[#0F766E] to-[#14B8A6]",
+  Wealth: "from-[#166534] via-[#16A34A] to-[#052E16]",
+  Create: "from-[#6D28D9] via-[#9333EA] to-[#2E1065]",
+  Skills: "from-[#1D4ED8] via-[#3B82F6] to-[#0A2540]",
+  World: "from-[#475569] via-[#64748B] to-[#0F172A]",
+  Lifestyle: "from-[#C2410C] via-[#F97316] to-[#451A03]",
+};
+
+function getYouTubeUrls(
+  youtubeUrl?: string,
+  sourceUrl?: string,
+): { watchUrl?: string } {
+  const candidates = [youtubeUrl, sourceUrl].filter(Boolean) as string[];
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = new URL(candidate);
+      const host = parsed.hostname.replace(/^www\./, "").replace(/^m\./, "");
+      const path = parsed.pathname;
+      let videoId: string | null = null;
+
+      if (host === "youtu.be") {
+        const shortId = path.slice(1).split("/")[0];
+        if (YOUTUBE_ID_REGEX.test(shortId)) videoId = shortId;
+      } else if (
+        host === "youtube.com"
+        || host === "music.youtube.com"
+        || host === "youtube-nocookie.com"
+      ) {
+        if (path === "/watch") {
+          const v = parsed.searchParams.get("v");
+          if (v && YOUTUBE_ID_REGEX.test(v)) videoId = v;
+        } else if (path.startsWith("/shorts/")) {
+          const shortsId = path.split("/")[2];
+          if (shortsId && YOUTUBE_ID_REGEX.test(shortsId)) videoId = shortsId;
+        } else if (path.startsWith("/embed/")) {
+          const embedId = path.split("/")[2];
+          if (embedId && YOUTUBE_ID_REGEX.test(embedId)) videoId = embedId;
+        }
+      }
+
+      if (!videoId) continue;
+
+      return {
+        watchUrl: `https://www.youtube.com/watch?v=${videoId}`,
+      };
+    } catch {
+      // Ignore malformed URLs and try other candidates.
+    }
+  }
+
+  return { watchUrl: sourceUrl };
+}
+
 export function Reel({
   signal,
   saved,
@@ -33,10 +90,13 @@ export function Reel({
 }: Props) {
   const meta = CATEGORY_META[signal.category];
   const Icon = meta.Icon;
-  const isVideo = !!signal.youtubeEmbedUrl;
+  const { watchUrl } = useMemo(
+    () => getYouTubeUrls(signal.youtubeEmbedUrl, signal.sourceUrl),
+    [signal.youtubeEmbedUrl, signal.sourceUrl],
+  );
+  const fallbackGradient = CATEGORY_FALLBACK_GRADIENT[signal.category];
+  const watchTargetUrl = signal.sourceUrl ?? watchUrl;
 
-  const [playVideo, setPlayVideo] = useState(false);
-  const [embedFailed, setEmbedFailed] = useState(false);
   const [qIndex, setQIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [shake, setShake] = useState(false);
@@ -80,9 +140,6 @@ export function Reel({
 
   const retry = () => setPicked(null);
 
-  const watchOnYouTubeUrl = signal.sourceUrl
-    ?? (signal.youtubeEmbedUrl ? signal.youtubeEmbedUrl.replace("/embed/", "/watch?v=").split("?")[0] : undefined);
-
   return (
     <section
       className="relative h-[100dvh] w-full snap-start snap-always overflow-hidden bg-background"
@@ -91,46 +148,34 @@ export function Reel({
       {/* Video / visual area — 60% */}
       <div className="relative w-full" style={{ height: "60dvh" }}>
         <div className="absolute inset-0 bg-black">
-          {isVideo && playVideo && !embedFailed ? (
-            <iframe
-              src={`${signal.youtubeEmbedUrl}${signal.youtubeEmbedUrl?.includes("?") ? "&" : "?"}autoplay=1`}
-              title={signal.title}
-              className="absolute inset-0 h-full w-full"
-              allow="accelerated-sensors; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              onError={() => setEmbedFailed(true)}
+          <div className={`relative h-full w-full bg-gradient-to-br ${fallbackGradient}`}>
+            <div
+              className="absolute inset-0 opacity-[0.08]"
+              style={{
+                backgroundImage:
+                  "linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)",
+                backgroundSize: "36px 36px",
+              }}
             />
-          ) : (
-            <button
-              type="button"
-              onClick={() => isVideo && !embedFailed && setPlayVideo(true)}
-              className={`group relative h-full w-full bg-gradient-to-br ${meta.gradient}`}
-              aria-label={isVideo ? "Play video" : signal.title}
-            >
-              <div
-                className="absolute inset-0 opacity-[0.07]"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)",
-                  backgroundSize: "32px 32px",
-                }}
-              />
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.1),transparent_60%)]" />
-
-              <div className="absolute inset-0 flex items-center justify-center">
-                {isVideo && !embedFailed ? (
-                  <span className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-signal text-signal-foreground shadow-glow transition-transform group-hover:scale-105 group-active:scale-95">
-                    <Play className="h-9 w-9 ml-0.5" fill="currentColor" strokeWidth={0} />
-                  </span>
-                ) : (
-                  <Icon className={`h-24 w-24 opacity-90 ${meta.tone}`} strokeWidth={1.2} />
-                )}
-              </div>
-
-              {/* Bottom gradient overlay */}
-              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
-            </button>
-          )}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.18),transparent_60%)]" />
+            <div className="relative z-[1] flex h-full flex-col items-center justify-center px-6 text-center">
+              <h3 className="text-[22px] font-semibold tracking-tight text-white drop-shadow-sm">
+                {signal.title}
+              </h3>
+              {watchTargetUrl && (
+                <a
+                  href={watchTargetUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-4 py-2 text-[13px] font-medium text-white backdrop-blur transition hover:bg-black/60"
+                >
+                  <Play className="h-3.5 w-3.5" fill="currentColor" strokeWidth={0} />
+                  Watch on YouTube
+                </a>
+              )}
+            </div>
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/70 to-transparent" />
+          </div>
         </div>
 
         {/* Bookmark — top right */}
@@ -145,19 +190,6 @@ export function Reel({
             <Bookmark className="h-5 w-5" />
           )}
         </button>
-
-        {/* Watch on YouTube fallback */}
-        {isVideo && embedFailed && watchOnYouTubeUrl && (
-          <a
-            href={watchOnYouTubeUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="absolute top-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-full bg-black/65 backdrop-blur px-3 py-1.5 text-[11px] text-white border border-white/10"
-          >
-            <Play className="h-3 w-3" fill="currentColor" strokeWidth={0} />
-            Watch on YouTube
-          </a>
-        )}
 
         {/* Category chip — bottom-left */}
         <div className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1.5 rounded-md bg-black/60 backdrop-blur px-2 py-1 text-[10.5px] uppercase tracking-[0.14em] text-white/90 border border-white/10">
@@ -312,7 +344,7 @@ export function Reel({
           )}
         </div>
 
-        {(signal.sourceUrl || watchOnYouTubeUrl) && (
+        {(signal.sourceUrl || watchUrl) && (
           <div className="mt-1.5">
             <button
               onClick={() => setShowDeeper((v) => !v)}
@@ -330,7 +362,7 @@ export function Reel({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
-                  href={signal.sourceUrl ?? watchOnYouTubeUrl}
+                  href={signal.sourceUrl ?? watchUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-1.5 flex items-center justify-between gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5 hover:border-muted-foreground/40 transition overflow-hidden"
